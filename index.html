@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Luminary Entertainment Simulator</title>
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #ff4c4c;
+            --light-blue: #e6f2ff;
+            --dark-blue: #004080;
+            --disney-purple: #9b59b6;
+            --disney-gold: #f1c40f;
+            --background: #f8f9fa;
+            --text-color: #333;
+            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--disney-gold);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--disney-purple);
+            font-style: italic;
+        }
+
+        .game-container {
+            min-height: 400px;
+        }
+
+        .game-intro {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .scene-container {
+            padding: 20px;
+            background-color: var(--light-blue);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .scene-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .scene-title {
+            font-size: 1.3em;
+            color: var(--dark-blue);
+            font-weight: bold;
+        }
+
+        .scene-description {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background-color: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: left;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn:hover {
+            background-color: var(--light-blue);
+            transform: translateY(-2px);
+        }
+
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            background-color: #fff8e1;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--disney-gold);
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-title {
+            color: var(--disney-purple);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .result-description {
+            margin-bottom: 15px;
+        }
+
+        .advice-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            border-left: 5px solid #4caf50;
+            display: none;
+        }
+
+        .advice-title {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .advice-content {
+            line-height: 1.6;
+        }
+
+        .next-btn {
+            background-color: var(--disney-purple);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 15px;
+            display: block;
+            margin-left: auto;
+        }
+
+        .next-btn:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+        }
+
+        .next-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Hide real-time stats; only show final stats at end. */
+        .stats-container, .progress-container {
+            display: none;
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .game-over h2 {
+            color: var(--disney-purple);
+            margin-bottom: 20px;
+        }
+
+        .final-metrics-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .final-metric {
+            background-color: #f2f2f2;
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .final-metric-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .final-metric-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--dark-blue);
+        }
+
+        .restart-btn {
+            background-color: var(--disney-gold);
+            color: var(--dark-blue);
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 30px;
+            display: inline-block;
+        }
+
+        .restart-btn:hover {
+            background-color: #f39c12;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alt-timelines-btn {
+            background-color: #ff4c4c;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alt-timelines-btn:hover {
+            background-color: #e43b3b;
+            transform: translateY(-2px);
+        }
+
+        .alt-timelines-explore {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffe5e5;
+            border-radius: 8px;
+            border-left: 5px solid #ff4c4c;
+            display: none;
+            text-align: left;
+        }
+
+        .alt-timelines-explore h3 {
+            margin-bottom: 10px;
+            color: #c0392b;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Luminary Entertainment Simulator</h1>
+            <p class="subtitle">Strategic Decision Making</p>
+        </header>
+
+        <div class="game-container" id="gameContainer">
+            <!-- Game Introduction -->
+            <div class="game-intro" id="gameIntro">
+                <h2>Welcome, CEO of Luminary Entertainment!</h2>
+                <p><strong>Company Overview (5C Analysis)</strong></p>
+                <ul style="text-align: left; margin: 20px 0;">
+                    <li><strong>Company:</strong> Founded in 1995, $2.8B annual revenue, known for family-friendly content</li>
+                    <li><strong>Customers:</strong> Primary: families with children (65%), Secondary: young adults (25%)</li>
+                    <li><strong>Competitors:</strong> Major studios with 45% market share combined</li>
+                    <li><strong>Collaborators:</strong> 150+ global distribution partners, 20+ production studios</li>
+                    <li><strong>Climate:</strong> Rapid digital transformation, streaming wars, changing consumer behavior</li>
+                </ul>
+                <p>Current Challenge: Digital Transformation Strategy</p>
+                <button id="startBtn" class="next-btn">Begin Strategic Planning</button>
+            </div>
+
+            <!-- Scene Container -->
+            <div class="scene-container hidden" id="sceneContainer">
+                <div class="scene-header">
+                    <div class="scene-title" id="sceneTitle">Scene Title</div>
+                </div>
+
+                <div class="scene-description" id="sceneDescription">
+                    <!-- Scene text populated dynamically -->
+                </div>
+
+                <div class="choices-container" id="choicesContainer">
+                    <!-- Option buttons will be generated dynamically -->
+                </div>
+
+                <div class="result-container" id="resultContainer">
+                    <div class="result-title" id="resultTitle">Decision Result</div>
+                    <div class="result-description" id="resultDescription">Result description...</div>
+                    <button id="nextSceneBtn" class="next-btn">Continue</button>
+                </div>
+
+                <div class="advice-container" id="adviceContainer">
+                    <div class="advice-title">Management Insight</div>
+                    <div class="advice-content" id="adviceContent">
+                        <!-- management analysis -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div class="game-over hidden" id="gameOver">
+                <h2>Final Report</h2>
+                <p>Digital Transformation Analysis</p>
+                
+                <div class="final-metrics-container" id="finalMetrics"></div>
+                <div id="finalOutcomeMessage" style="margin-top:20px;"></div>
+                
+                <div class="analysis-container" style="margin-top:30px; text-align:left;">
+                    <h3>Strategic Decision Analysis</h3>
+                    <div id="decisionAnalysis"></div>
+                </div>
+
+                <button id="restartBtn" class="restart-btn">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // We keep the same 6 stats
+        const gameData = {
+            playerStats: {
+                finance: 70,
+                innovation: 70,
+                brand: 70,
+                morale: 70,
+                publicOpinion: 70,
+                operations: 70
+            },
+
+            currentSceneIndex: 0,
+
+            scenes: [
+                {
+                    id: 1,
+                    title: "Phase 1: Digital Vision & Leadership",
+                    description: `
+                        Digital transformation starts with clear vision and leadership commitment.
+                        Current situation:
+                        - Traditional media revenue declining 8% yearly
+                        - Digital disruption across entertainment industry
+                        - Internal resistance to change: 45% of middle management
+                        <br><br>
+                        <strong>How will you approach the transformation leadership?</strong>
+                    `,
+                    choices: [
+                        {
+                            text: "Radical Transformation: Create new digital-first division, hire tech executives",
+                            result: {
+                                title: "Digital Revolution",
+                                description: "Major organizational restructuring initiated with new digital leadership.",
+                                impacts: {
+                                    finance: -20,
+                                    innovation: +25,
+                                    brand: +10,
+                                    morale: -10,
+                                    publicOpinion: +20,
+                                    operations: -15
+                                },
+                                insight: "Bold move that accelerates transformation but creates internal tension. Success depends on change management."
+                            }
+                        },
+                        {
+                            text: "Balanced Evolution: Hybrid structure with digital champions in each division",
+                            result: {
+                                title: "Collaborative Change",
+                                description: "Digital transformation through existing organizational structure with new capabilities.",
+                                impacts: {
+                                    finance: -10,
+                                    innovation: +15,
+                                    brand: +15,
+                                    morale: +10,
+                                    publicOpinion: +10,
+                                    operations: +5
+                                },
+                                insight: "Balanced approach maintains stability while driving change. Requires strong cross-functional coordination."
+                            }
+                        },
+                        {
+                            text: "Gradual Integration: Digital initiatives within current structure",
+                            result: {
+                                title: "Evolutionary Path",
+                                description: "Slow but steady digital adoption through existing channels.",
+                                impacts: {
+                                    finance: -5,
+                                    innovation: +5,
+                                    brand: +5,
+                                    morale: +15,
+                                    publicOpinion: -5,
+                                    operations: +10
+                                },
+                                insight: "Safe but slow approach. Risk of falling behind market changes."
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "Phase 2: Technology Infrastructure",
+                    description: `
+                        Technical foundation assessment:
+                        - Legacy systems: 60% of IT infrastructure
+                        - Cloud adoption: 30% of workloads
+                        - Tech debt: $200M estimated
+                        - Data silos across divisions
+                        <br><br>
+                        <strong>Choose your technology strategy:</strong>
+                    `,
+                    choices: [
+                        {
+                            text: "Cloud-First Transformation: Full cloud migration, microservices architecture ($600M)",
+                            result: {
+                                title: "Complete Tech Overhaul",
+                                description: "Major infrastructure modernization with cloud-native architecture.",
+                                impacts: {
+                                    finance: -25,
+                                    innovation: +30,
+                                    brand: +10,
+                                    morale: +15,
+                                    publicOpinion: +15,
+                                    operations: -10
+                                },
+                                insight: "High initial cost but creates modern, scalable foundation for future growth."
+                            }
+                        },
+                        {
+                            text: "Hybrid Architecture: Modernize critical systems first ($300M)",
+                            result: {
+                                title: "Progressive Modernization",
+                                description: "Balanced approach to infrastructure updates.",
+                                impacts: {
+                                    finance: -15,
+                                    innovation: +20,
+                                    brand: +10,
+                                    morale: +10,
+                                    publicOpinion: +10,
+                                    operations: +10
+                                },
+                                insight: "Pragmatic approach balancing modernization with cost control."
+                            }
+                        },
+                        {
+                            text: "Essential Updates: Critical fixes and minimal cloud adoption ($150M)",
+                            result: {
+                                title: "Basic Modernization",
+                                description: "Limited updates to existing infrastructure.",
+                                impacts: {
+                                    finance: -5,
+                                    innovation: +5,
+                                    brand: 0,
+                                    morale: -5,
+                                    publicOpinion: 0,
+                                    operations: +15
+                                },
+                                insight: "Cost-effective but limits future digital capabilities."
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "Phase 3: Data Strategy & Analytics",
+                    description: `
+                        Current data landscape:
+                        - Customer data fragmented across platforms
+                        - Limited AI/ML capabilities
+                        - Privacy compliance challenges
+                        - Analytics maturity: Basic
+                        <br><br>
+                        <strong>Select your data strategy approach:</strong>
+                    `,
+                    choices: [
+                        {
+                            text: "Advanced Analytics: Unified data platform with AI/ML capabilities ($400M)",
+                            result: {
+                                title: "Data-Driven Transformation",
+                                description: "Comprehensive data platform with advanced analytics.",
+                                impacts: {
+                                    finance: -20,
+                                    innovation: +25,
+                                    brand: +15,
+                                    morale: +10,
+                                    publicOpinion: +15,
+                                    operations: +20
+                                },
+                                insight: "Creates strong competitive advantage through data capabilities."
+                            }
+                        },
+                        {
+                            text: "Focused Analytics: Key business areas with selected AI features ($200M)",
+                            result: {
+                                title: "Targeted Data Strategy",
+                                description: "Strategic data initiatives in priority areas.",
+                                impacts: {
+                                    finance: -10,
+                                    innovation: +15,
+                                    brand: +10,
+                                    morale: +5,
+                                    publicOpinion: +10,
+                                    operations: +15
+                                },
+                                insight: "Good balance of capability and investment."
+                            }
+                        },
+                        {
+                            text: "Basic Integration: Data warehouse upgrade with basic analytics ($100M)",
+                            result: {
+                                title: "Fundamental Data Infrastructure",
+                                description: "Basic data capabilities with limited analytics.",
+                                impacts: {
+                                    finance: -5,
+                                    innovation: +5,
+                                    brand: +5,
+                                    morale: 0,
+                                    publicOpinion: +5,
+                                    operations: +10
+                                },
+                                insight: "Minimal improvement in data capabilities."
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: 4,
+                    title: "Phase 4: Digital Culture & Capabilities",
+                    description: `
+                        Organizational readiness:
+                        - Digital skills gap in 60% of workforce
+                        - Change resistance in 40% of employees
+                        - Innovation culture score: 6/10
+                        - Digital literacy: Medium-Low
+                        <br><br>
+                        <strong>Choose your people transformation approach:</strong>
+                    `,
+                    choices: [
+                        {
+                            text: "Comprehensive Change: Digital academy, innovation labs, mass upskilling ($300M)",
+                            result: {
+                                title: "Cultural Revolution",
+                                description: "Complete organizational transformation toward digital culture.",
+                                impacts: {
+                                    finance: -15,
+                                    innovation: +25,
+                                    brand: +20,
+                                    morale: +25,
+                                    publicOpinion: +15,
+                                    operations: +15
+                                },
+                                insight: "Long-term investment in people creates sustainable digital capabilities."
+                            }
+                        },
+                        {
+                            text: "Targeted Development: Key roles upskilling, selective hiring ($150M)",
+                            result: {
+                                title: "Strategic Capability Building",
+                                description: "Focused approach to digital capability development.",
+                                impacts: {
+                                    finance: -10,
+                                    innovation: +15,
+                                    brand: +10,
+                                    morale: +15,
+                                    publicOpinion: +10,
+                                    operations: +10
+                                },
+                                insight: "Balanced approach to culture change and capability building."
+                            }
+                        },
+                        {
+                            text: "Essential Training: Basic digital training programs ($50M)",
+                            result: {
+                                title: "Basic Digital Literacy",
+                                description: "Minimal investment in digital capabilities.",
+                                impacts: {
+                                    finance: -5,
+                                    innovation: +5,
+                                    brand: +5,
+                                    morale: +5,
+                                    publicOpinion: +5,
+                                    operations: +5
+                                },
+                                insight: "Limited impact on organizational digital maturity."
+                            }
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let gameState = {
+            playerStats: {
+                finance: 70,
+                innovation: 70,
+                brand: 70,
+                morale: 70,
+                publicOpinion: 70,
+                operations: 70
+            },
+            currentSceneIndex: 0,
+            completedScenes: [],
+            totalInvestment: 0    // Add investment tracking
+        };
+
+        // DOM Elements
+        const elements = {
+            gameIntro: document.getElementById('gameIntro'),
+            startBtn: document.getElementById('startBtn'),
+            sceneContainer: document.getElementById('sceneContainer'),
+            sceneTitle: document.getElementById('sceneTitle'),
+            sceneDescription: document.getElementById('sceneDescription'),
+            choicesContainer: document.getElementById('choicesContainer'),
+            resultContainer: document.getElementById('resultContainer'),
+            resultTitle: document.getElementById('resultTitle'),
+            resultDescription: document.getElementById('resultDescription'),
+            nextSceneBtn: document.getElementById('nextSceneBtn'),
+            adviceContainer: document.getElementById('adviceContainer'),
+            adviceContent: document.getElementById('adviceContent'),
+            gameOver: document.getElementById('gameOver'),
+            finalMetrics: document.getElementById('finalMetrics'),
+            finalOutcomeMessage: document.getElementById('finalOutcomeMessage'),
+            knowledgeGapsContainer: document.getElementById('knowledgeGapsContainer'),
+            restartBtn: document.getElementById('restartBtn'),
+            exploreBtn: document.getElementById('exploreBtn'),
+            altTimelinesContainer: document.getElementById('altTimelinesContainer'),
+            altTimelinesContent: document.getElementById('altTimelinesContent')
+        };
+
+        function calculateOptimalPath() {
+            return gameData.scenes.map((scene, index) => {
+                const optimalChoice = scene.choices.reduce((best, current) => {
+                    const currentScore = Object.values(current.result.impacts)
+                        .reduce((sum, impact) => sum + impact, 0);
+                    const bestScore = Object.values(best.result.impacts)
+                        .reduce((sum, impact) => sum + impact, 0);
+                    return currentScore > bestScore ? current : best;
+                });
+                return {
+                    sceneIndex: index,
+                    choice: optimalChoice,
+                    reasoning: getOptimalReasoning(scene.title, optimalChoice)
+                };
+            });
+        }
+
+        function getOptimalReasoning(sceneTitle, choice) {
+            const reasonings = {
+                "Phase 1: Digital Vision & Leadership": 
+                    "The balanced evolution approach provides the best mix of innovation and stability, " +
+                    "minimizing disruption while maintaining forward momentum.",
+                "Phase 2: Technology Infrastructure":
+                    "A hybrid architecture offers the optimal balance between modernization and cost control, " +
+                    "while reducing implementation risks.",
+                "Phase 3: Data Strategy & Analytics":
+                    "Advanced analytics investment provides long-term competitive advantage through " +
+                    "better customer insights and operational efficiency.",
+                "Phase 4: Digital Culture & Capabilities":
+                    "Comprehensive change management ensures sustainable transformation by " +
+                    "building strong digital capabilities across the organization."
+            };
+            return reasonings[sceneTitle] || "Optimal choice based on balanced impact scores.";
+        }
+
+        function calculateTransformationScore(stats) {
+            const weights = {
+                finance: 0.2,
+                innovation: 0.2,
+                brand: 0.15,
+                morale: 0.15,
+                publicOpinion: 0.15,
+                operations: 0.15
+            };
+            
+            const baseScore = Math.round(
+                Object.entries(stats).reduce((score, [stat, value]) => {
+                    return score + (value * weights[stat]);
+                }, 0) / 100
+            );
+
+            // Investment efficiency factor
+            const investmentEfficiency = calculateInvestmentEfficiency(gameState.totalInvestment, stats);
+            
+            return {
+                baseScore: baseScore,
+                investmentEfficiency: investmentEfficiency,
+                finalScore: Math.round((baseScore + investmentEfficiency) / 2)
+            };
+        }
+
+        function calculateInvestmentEfficiency(totalInvestment, stats) {
+            // Maximum possible investment (if choosing all expensive options)
+            const maxInvestment = 1450; // $600M + $400M + $300M + $150M
+            
+            // Calculate average improvement across all stats
+            const avgImprovement = Object.values(stats).reduce((sum, val) => sum + (val - 70), 0) / 6;
+            
+            // Calculate efficiency: improvement per million invested
+            const efficiency = (avgImprovement / totalInvestment) * 100;
+            
+            // Score between 0-100 based on efficiency and total investment
+            const investmentScore = Math.round(
+                (1 - (totalInvestment / maxInvestment) * 0.5 + efficiency * 0.5) * 100
+            );
+            
+            return Math.min(100, Math.max(0, investmentScore));
+        }
+
+        function getTransformationAnalysis(scores) {
+            const { baseScore, investmentEfficiency, finalScore } = scores;
+            
+            let analysis = `<strong>Overall Score: ${finalScore}%</strong><br><br>`;
+            analysis += `Base Performance: ${baseScore}%<br>`;
+            analysis += `Investment Efficiency: ${investmentEfficiency}%<br>`;
+            analysis += `Total Investment: $${gameState.totalInvestment}M<br><br>`;
+            
+            if (finalScore >= 80) {
+                analysis += "Exceptional transformation leadership! You achieved excellent results while maintaining cost efficiency.";
+            } else if (finalScore >= 60) {
+                analysis += "Good progress on digital transformation. The balance between investment and outcomes shows careful planning.";
+            } else {
+                analysis += "The transformation faced challenges in achieving optimal returns on investment. Consider reviewing the balance between spending and outcomes.";
+            }
+            
+            return analysis;
+        }
+
+        function initGame() {
+            resetGameState();
+
+            elements.startBtn.addEventListener('click', startGame);
+            elements.restartBtn.addEventListener('click', restartGame);
+            elements.nextSceneBtn.addEventListener('click', loadNextScene);
+        }
+
+        function resetGameState() {
+            for (let stat in gameData.playerStats) {
+                gameState.playerStats[stat] = gameData.playerStats[stat];
+            }
+            gameState.currentSceneIndex = 0;
+            gameState.completedScenes = [];
+            gameState.totalInvestment = 0; // Reset total investment
+        }
+
+        function startGame() {
+            elements.gameIntro.classList.add('hidden');
+            setTimeout(() => {
+                elements.sceneContainer.classList.remove('hidden');
+                loadScene(gameState.currentSceneIndex);
+            }, 500);
+        }
+
+        function restartGame() {
+            elements.gameOver.classList.add('hidden');
+            elements.altTimelinesContainer.style.display = 'none';
+            setTimeout(() => {
+                resetGameState();
+                elements.sceneContainer.classList.remove('hidden');
+                loadScene(gameState.currentSceneIndex);
+            }, 500);
+        }
+
+        function loadScene(index) {
+            const scene = gameData.scenes[index];
+            elements.sceneTitle.innerHTML = scene.title;
+            elements.sceneDescription.innerHTML = scene.description;
+            elements.choicesContainer.innerHTML = '';
+
+            scene.choices.forEach((choice, choiceIndex) => {
+                const choiceBtn = document.createElement('button');
+                choiceBtn.className = 'choice-btn';
+                choiceBtn.textContent = choice.text;
+                choiceBtn.addEventListener('click', () => makeChoice(index, choiceIndex));
+                elements.choicesContainer.appendChild(choiceBtn);
+            });
+
+            elements.resultContainer.style.display = 'none';
+            elements.adviceContainer.style.display = 'none';
+        }
+
+        function makeChoice(sceneIndex, choiceIndex) {
+            const scene = gameData.scenes[sceneIndex];
+            const choice = scene.choices[choiceIndex];
+            const result = choice.result;
+            
+            // Track investment from choice text (extract amount in millions)
+            const investmentMatch = choice.text.match(/\$(\d+)M/);
+            if (investmentMatch) {
+                gameState.totalInvestment += parseInt(investmentMatch[1]);
+            }
+
+            updatePlayerStats(result.impacts);
+            gameState.completedScenes.push({ sceneIndex, choiceIndex, result });
+            showResult(result);
+            
+            // Disable other choices
+            const choiceButtons = elements.choicesContainer.querySelectorAll('.choice-btn');
+            choiceButtons.forEach(button => {
+                button.disabled = true;
+                button.style.opacity = '0.5';
+                button.style.cursor = 'not-allowed';
+            });
+
+            // Highlight chosen button
+            choiceButtons[choiceIndex].style.borderColor = 'var(--disney-purple)';
+            choiceButtons[choiceIndex].style.borderWidth = '3px';
+            choiceButtons[choiceIndex].style.opacity = '1';
+        }
+
+        function showResult(result) {
+            elements.resultTitle.textContent = result.title;
+            elements.resultDescription.textContent = result.description;
+            if (result.insight) {
+                elements.adviceContent.innerHTML = `<strong>Management Insight:</strong> ${result.insight}`;
+                elements.adviceContainer.style.display = 'block';
+            } else {
+                elements.adviceContainer.style.display = 'none';
+            }
+
+            elements.resultContainer.style.display = 'block';
+            elements.resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updatePlayerStats(impacts) {
+            for (let stat in impacts) {
+                if (gameState.playerStats[stat] !== undefined) {
+                    gameState.playerStats[stat] += impacts[stat];
+                    if (gameState.playerStats[stat] > 100) gameState.playerStats[stat] = 100;
+                    if (gameState.playerStats[stat] < 0) gameState.playerStats[stat] = 0;
+                }
+            }
+        }
+
+        function loadNextScene() {
+            gameState.currentSceneIndex++;
+            if (gameState.currentSceneIndex < gameData.scenes.length) {
+                setTimeout(() => {
+                    loadScene(gameState.currentSceneIndex);
+                }, 500);
+            } else {
+                showGameOver();
+            }
+        }
+
+        function showGameOver() {
+            elements.sceneContainer.classList.add('hidden');
+            elements.gameOver.classList.remove('hidden');
+            
+            const transformationScore = calculateTransformationScore(gameState.playerStats);
+            const optimalPath = calculateOptimalPath();
+            
+            // Display final metrics
+            elements.finalMetrics.innerHTML = `
+                <div class="final-metric">
+                    <div class="final-metric-label">Finance</div>
+                    <div class="final-metric-value">${gameState.playerStats.finance}</div>
+                </div>
+                <div class="final-metric">
+                    <div class="final-metric-label">Innovation</div>
+                    <div class="final-metric-value">${gameState.playerStats.innovation}</div>
+                </div>
+                <div class="final-metric">
+                    <div class="final-metric-label">Brand</div>
+                    <div class="final-metric-value">${gameState.playerStats.brand}</div>
+                </div>
+                <div class="final-metric">
+                    <div class="final-metric-label">Morale</div>
+                    <div class="final-metric-value">${gameState.playerStats.morale}</div>
+                </div>
+                <div class="final-metric">
+                    <div class="final-metric-label">Public Opinion</div>
+                    <div class="final-metric-value">${gameState.playerStats.publicOpinion}</div>
+                </div>
+                <div class="final-metric">
+                    <div class="final-metric-label">Operations</div>
+                    <div class="final-metric-value">${gameState.playerStats.operations}</div>
+                </div>
+            `;
+            
+            // Show transformation score and analysis
+            elements.finalOutcomeMessage.innerHTML = getTransformationAnalysis(transformationScore);
+
+            // Compare user choices with optimal choices
+            let analysisHTML = '<div class="decision-comparison">';
+            gameState.completedScenes.forEach((scene, index) => {
+                const originalScene = gameData.scenes[scene.sceneIndex];
+                const userChoice = originalScene.choices[scene.choiceIndex];
+                const optimal = optimalPath[scene.sceneIndex];
+                
+                // Extract investment amounts
+                const userInvestment = userChoice.text.match(/\$(\d+)M/) ? `$${userChoice.text.match(/\$(\d+)M/)[1]}M` : 'N/A';
+                const optimalInvestment = optimal.choice.text.match(/\$(\d+)M/) ? `$${optimal.choice.text.match(/\$(\d+)M/)[1]}M` : 'N/A';
+                
+                analysisHTML += `
+                    <div class="scene-analysis" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                        <h4>${originalScene.title}</h4>
+                        <p><strong>Your Choice:</strong> ${userChoice.text}</p>
+                        <p><strong>Investment:</strong> ${userInvestment}</p>
+                        <p><strong>Optimal Choice:</strong> ${optimal.choice.text}</p>
+                        <p><strong>Optimal Investment:</strong> ${optimalInvestment}</p>
+                        <p><strong>Analysis:</strong> ${optimal.reasoning}</p>
+                    </div>
+                `;
+            });
+            analysisHTML += '</div>';
+            
+            document.getElementById('decisionAnalysis').innerHTML = analysisHTML;
+        }
+
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
